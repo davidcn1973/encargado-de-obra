@@ -18,6 +18,9 @@ jobs:
       - run: npm install
       - run: npm install @capacitor/camera@6 @capacitor/app@6
       - run: npm install pdfjs-dist@3.11.174 dxf-parser@1.1.2
+      - name: Conexion nativa (evita bloqueos con Google Drive)
+        run: |
+          node -e "const f='capacitor.config.json',c=JSON.parse(require('fs').readFileSync(f));c.plugins=c.plugins||{};c.plugins.CapacitorHttp={enabled:true};require('fs').writeFileSync(f,JSON.stringify(c,null,2));console.log(JSON.stringify(c))"
       - run: cp node_modules/jspdf/dist/jspdf.umd.min.js www/
       - name: Copiar lectores de PDF y DXF
         run: |
@@ -42,10 +45,4 @@ jobs:
       - name: Firma fija (permite actualizar encima)
         run: |
           mkdir -p ~/.android
-          cp debug.keystore ~/.android/debug.keystore
-          keytool -list -keystore ~/.android/debug.keystore -storepass android | head -5
-      - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
-      - uses: actions/upload-artifact@v4
-        with:
-          name: encargado-de-obra-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          cp debug.keystore ~/.android/debug.key
